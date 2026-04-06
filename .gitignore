@@ -1,0 +1,6 @@
+# Terraformの不要なファイルをGit管理から除外するルール
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+plan_output.txt

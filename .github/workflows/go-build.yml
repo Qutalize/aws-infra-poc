@@ -1,0 +1,48 @@
+name: Go Build & Deploy to S3
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/**']
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: app/go.sum
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: go mod download
+
+      - name: Run tests
+        working-directory: ./app
+        run: go test ./... -v
+
+      - name: Build for Linux ARM64
+        working-directory: ./app
+        env:
+          GOOS: linux
+          GOARCH: arm64
+          CGO_ENABLED: 0
+        run: go build -o ../dist/api-server .
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload binary to S3
+        run: |
+          aws s3 cp dist/api-server s3://${{ secrets.APP_BUCKET_NAME }}/api-server
+          echo "S3アップロード完了: s3://${{ secrets.APP_BUCKET_NAME }}/api-server"
