@@ -56,8 +56,8 @@ resource "aws_cloudfront_distribution" "main" {
     target_origin_id       = "alb-origin"
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0 #test5限定
-    default_ttl            = 10 #test5限定
-    max_ttl                = 30 #test5限定
+    default_ttl            = 30 #test5限定
+    max_ttl                = 60 #test5限定
     compress               = true #test5限定
       forwarded_values { #test5限定
       query_string = false
