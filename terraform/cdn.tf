@@ -55,7 +55,15 @@ resource "aws_cloudfront_distribution" "main" {
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = "alb-origin"
     viewer_protocol_policy = "redirect-to-https"
-    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+    min_ttl                = 0 #test5限定
+    default_ttl            = 10 #test5限定
+    max_ttl                = 30 #test5限定
+    compress               = true #test5限定
+      forwarded_values { #test5限定
+      query_string = false
+      cookies { forward = "none" }
+    }
+    # cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
   }
 
   restrictions {
